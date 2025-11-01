@@ -206,7 +206,7 @@ export default function JackarooLanding() {
                   wordWrap: "break-word",
                 }}
               >
-                Священник • Phoenix
+                Автор • Священник
               </h1>
 
               <p
@@ -272,22 +272,6 @@ export default function JackarooLanding() {
                   {copied ? "Скопировано!" : "Скопировать"}
                 </button>
               </div>
-
-              <ul
-                style={{
-                  marginTop: xs ? "1rem" : "1.5rem",
-                  fontSize: layout.smallText,
-                  color: "#a3a3a3",
-                  paddingLeft: 0,
-                }}
-              >
-                <li style={{ marginBottom: "0.25rem", listStyle: "none" }}>
-                  • Нажмите «Скопировать», чтобы отправить ID в WePlay.
-                </li>
-                <li style={{ listStyle: "none" }}>
-                  • Пролистайте ниже, чтобы прочитать правила Джакаро.
-                </li>
-              </ul>
             </div>
 
             {/* Avatar column */}
@@ -419,22 +403,26 @@ export default function JackarooLanding() {
             <RuleDetails title="Значения карт">
               <ul style={{ paddingLeft: "1.25rem", margin: 0 }}>
                 <li style={{ marginBottom: "0.25rem" }}>
-                  <strong>Туз</strong>: вывести фишку из Дома на Базу ИЛИ пройти
+                  <strong>13</strong>: вывести фишку из Дома на Базу.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  <strong>11</strong>: вывести фишку из Дома на Базу или пройти
                   1 или 11 шагов по треку.
                 </li>
                 <li style={{ marginBottom: "0.25rem" }}>
-                  <strong>Король</strong>: вывести фишку из Дома на Базу.
+                  <strong>7</strong>: разбить на несколько ходов и распределить
+                  между двумя фишками.
                 </li>
                 <li style={{ marginBottom: "0.25rem" }}>
-                  <strong>Валет</strong>: поменять местами две фишки на треке
+                  <strong>5</strong>: двигать любую фишку на 5 клеток (кроме
+                  чужих фишек, которые находятся на своей Базе).
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  <strong>4</strong>: ход назад на 4 клетки.
+                </li>
+                <li>
+                  <strong>Обмен</strong>: поменять местами две фишки на треке
                   (не в Доме/Базе/Безопасной зоне).
-                </li>
-                <li style={{ marginBottom: "0.25rem" }}>
-                  <strong>Семёрка</strong>: разбить на несколько ходов и
-                  распределить между двумя фишками.
-                </li>
-                <li style={{ marginBottom: "0.25rem" }}>
-                  <strong>Четвёрка</strong>: ход назад на 4 клетки.
                 </li>
                 <li>
                   <strong>Остальные</strong>: пройти вперёд на число, указанное
