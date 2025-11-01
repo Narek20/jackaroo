@@ -1,147 +1,536 @@
-import { useMemo } from "react";
-import "./App.css";
+import React, { useEffect, useMemo, useState } from "react";
+import terter from "./terter.png";
 
-type BubbleSpec = {
-  left: string;
-  size: number;
-  delay: number;
-  duration: number;
-};
-type TurtleSpec = { top: string; scale: number; delay: number };
-
-export default function App() {
-  const bubbles: BubbleSpec[] = useMemo(
-    () =>
-      Array.from({ length: 16 }).map((_, i) => ({
-        left: `${(i * 7 + 10) % 100}%`,
-        size: 8 + ((i * 13) % 18),
-        delay: (i % 5) * 0.6,
-        duration: 8 + (i % 7),
-      })),
-    []
+/** Tiny responsive hook (no CSS, no Tailwind) */
+function useViewport() {
+  const [w, setW] = useState<number>(
+    typeof window === "undefined" ? 1200 : window.innerWidth
   );
+  useEffect(() => {
+    const onResize = () => setW(window.innerWidth);
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return {
+    width: w,
+    // breakpoints
+    xs: w < 480,
+    sm: w < 640,
+    md: w < 768,
+    lg: w < 1024,
+    xl: w < 1280,
+  };
+}
 
-  const turtles: TurtleSpec[] = useMemo(
-    () => [
-      { top: "65%", scale: 1, delay: 0 },
-      { top: "40%", scale: 0.85, delay: 0.8 },
-      { top: "25%", scale: 1.15, delay: 1.4 },
-    ],
-    []
+function RuleDetails({ title, children, initiallyOpen = false }: any) {
+  const [open, setOpen] = useState(initiallyOpen);
+  return (
+    <details
+      open={open}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+      style={{
+        borderRadius: "1rem",
+        border: "1px solid #262626",
+        backgroundColor: "#171717",
+        padding: "1.25rem",
+        marginTop: "1rem",
+        boxShadow: open
+          ? "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)"
+          : "none",
+      }}
+    >
+      <summary
+        style={{
+          cursor: "pointer",
+          listStyle: "none",
+          fontWeight: 600,
+          fontSize: "1.125rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.75rem",
+          flexWrap: "wrap",
+        }}
+      >
+        {title}
+        <span
+          style={{
+            fontSize: "0.75rem",
+            color: "#737373",
+            display: open ? "none" : "inline",
+            marginLeft: "0.75rem",
+          }}
+        >
+          раскрыть
+        </span>
+        <span
+          style={{
+            fontSize: "0.75rem",
+            color: "#737373",
+            display: open ? "inline" : "none",
+            marginLeft: "0.75rem",
+          }}
+        >
+          свернуть
+        </span>
+      </summary>
+      <div
+        style={{
+          marginTop: "0.75rem",
+          color: "#d4d4d4",
+          fontSize: "0.875rem",
+          lineHeight: 1.6,
+        }}
+      >
+        {children}
+      </div>
+    </details>
   );
+}
+
+export default function JackarooLanding() {
+  const { xs, sm, md, lg, width } = useViewport();
+
+  // Responsive tokens (tweak here, everything else follows)
+  const layout = useMemo(() => {
+    const titleSize = xs
+      ? "1.75rem"
+      : sm
+      ? "2rem"
+      : md
+      ? "2.25rem"
+      : lg
+      ? "2.5rem"
+      : "2.75rem";
+    const containerPadY = xs ? "2rem" : sm ? "2.5rem" : md ? "3rem" : "4rem";
+    const containerPadX = xs ? "1rem" : sm ? "1.25rem" : "1.5rem";
+    const gridCols = md ? "1fr" : "1fr 1fr";
+    const gridGap = xs ? "1rem" : sm ? "1.25rem" : "2rem";
+    const avatar = xs ? 220 : sm ? 260 : md ? 300 : lg ? 320 : 340;
+    const mainMaxW = lg ? "56rem" : "56rem"; // keep center width fixed; padding handles small screens
+    const mainPadX = xs ? "0.75rem" : "1rem";
+    const heroMaxW = "72rem";
+    const smallText = xs ? "0.8125rem" : "0.875rem";
+    const bodyText = xs ? "0.9375rem" : "1rem"; // for buttons and ID box
+    const detailsTitle = xs ? "1rem" : "1.125rem";
+    return {
+      titleSize,
+      containerPadY,
+      containerPadX,
+      gridCols,
+      gridGap,
+      avatar,
+      mainMaxW,
+      mainPadX,
+      heroMaxW,
+      smallText,
+      bodyText,
+      detailsTitle,
+    };
+  }, [xs, sm, md, lg]);
+
+  const [copied, setCopied] = useState(false);
+  const weplayId = "samsino8";
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(`WePlay ID: ${weplayId}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
-    <div className="ocean">
-      <header className="nav">
-        <div className="brand">Turtly</div>
-        <nav className="links">
-          <a href="#about">About</a>
-          <a href="#features">Features</a>
-          <a href="#contact">Contact</a>
-        </nav>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#0a0a0a",
+        color: "#f5f5f5",
+      }}
+    >
+      {/* Hero */}
+      <header style={{ position: "relative", overflow: "hidden" }}>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "linear-gradient(to bottom right, rgba(245,158,11,0.10), rgba(239,68,68,0.10), rgba(217,70,239,0.10))",
+            filter: "blur(64px)",
+          }}
+        />
+        <div
+          style={{
+            position: "relative",
+            margin: "0 auto",
+            maxWidth: layout.heroMaxW,
+            padding: `${layout.containerPadY} ${layout.containerPadX} calc(${layout.containerPadY} + 1rem)`,
+          }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: layout.gridCols,
+              gap: layout.gridGap,
+              alignItems: "center",
+            }}
+          >
+            {/* Text column */}
+            <div
+              style={{
+                order: md
+                  ? 2
+                  : 1 /* put text below avatar on tiny screens if you want */,
+              }}
+            >
+              <h1
+                style={{
+                  fontWeight: 800,
+                  letterSpacing: "-0.02em",
+                  fontSize: layout.titleSize,
+                  margin: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                Священник • Phoenix
+              </h1>
+
+              <p
+                style={{
+                  marginTop: "0.75rem",
+                  color: "#d4d4d4",
+                  lineHeight: 1.6,
+                  fontSize: xs ? "0.95rem" : "1rem",
+                }}
+              >
+                Добро пожаловать! Здесь ваш игровой профиль и краткая инструкция
+                по настольной игре «Джакаро».
+              </p>
+
+              <div
+                style={{
+                  marginTop: xs ? "1rem" : "1.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div
+                  style={{
+                    borderRadius: "1rem",
+                    border: "1px solid #262626",
+                    backgroundColor: "#171717",
+                    padding: xs ? "0.6rem 0.875rem" : "0.75rem 1rem",
+                    fontSize: layout.bodyText,
+                    fontWeight: 600,
+                  }}
+                >
+                  WePlay ID:{" "}
+                  <span style={{ color: "#f59e0b" }}>{weplayId}</span>
+                </div>
+
+                <button
+                  onClick={handleCopy}
+                  style={{
+                    borderRadius: "1rem",
+                    border: "1px solid rgba(245,158,11,0.4)",
+                    backgroundColor: "rgba(245,158,11,0.10)",
+                    padding: xs ? "0.6rem 0.875rem" : "0.75rem 1rem",
+                    fontSize: layout.smallText,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "background-color 150ms ease",
+                    color: "#ffffff",
+                    width: xs ? "100%" : "auto",
+                    textAlign: "center",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor =
+                      "rgba(245,158,11,0.20)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor =
+                      "rgba(245,158,11,0.10)")
+                  }
+                >
+                  {copied ? "Скопировано!" : "Скопировать"}
+                </button>
+              </div>
+
+              <ul
+                style={{
+                  marginTop: xs ? "1rem" : "1.5rem",
+                  fontSize: layout.smallText,
+                  color: "#a3a3a3",
+                  paddingLeft: 0,
+                }}
+              >
+                <li style={{ marginBottom: "0.25rem", listStyle: "none" }}>
+                  • Нажмите «Скопировать», чтобы отправить ID в WePlay.
+                </li>
+                <li style={{ listStyle: "none" }}>
+                  • Пролистайте ниже, чтобы прочитать правила Джакаро.
+                </li>
+              </ul>
+            </div>
+
+            {/* Avatar column */}
+            <div
+              style={{
+                order: md ? 1 : 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div style={{ position: "relative" }}>
+                <div
+                  style={{
+                    position: "absolute",
+                    left: `-${Math.round(layout.avatar * 0.012)}px`,
+                    right: `-${Math.round(layout.avatar * 0.012)}px`,
+                    top: `-${Math.round(layout.avatar * 0.012)}px`,
+                    bottom: `-${Math.round(layout.avatar * 0.012)}px`,
+                    borderRadius: "2rem",
+                    backgroundImage:
+                      "linear-gradient(to top right, rgba(245,158,11,0.30), rgba(239,68,68,0.30), rgba(217,70,239,0.30))",
+                    filter: "blur(24px)",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "relative",
+                    borderRadius: "2rem",
+                    overflow: "hidden",
+                    border: "1px solid #262626",
+                    backgroundColor: "#171717",
+                    boxShadow:
+                      "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+                  }}
+                >
+                  <img
+                    src={terter}
+                    alt="Аватар Священника"
+                    style={{
+                      height: `${layout.avatar}px`,
+                      width: `${layout.avatar}px`,
+                      maxWidth: "90vw",
+                      maxHeight: "90vw",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <main className="hero">
-        <div className="pill">Ocean vibes, shipping fast.</div>
-        <h1 className="title">
-          Build calm software.
-          <br className="br-md" />
-          Swim past complexity.
-        </h1>
-        <p className="subtitle">
-          Minimal landing with SVG turtles, parallax waves, and rising bubbles —
-          all in pure CSS.
-        </p>
-        <div className="cta">
-          <button className="btn btn-primary">Dive in</button>
-          <button className="btn btn-outline">See Docs</button>
-        </div>
-      </main>
-
-      {/* Turtles */}
-      <div className="swim-layer">
-        {turtles.map((t, idx) => (
-          <div
-            key={idx}
-            className="turtle"
-            style={
-              {
-                "--top": t.top,
-                "--scale": t.scale,
-                "--delay": `${t.delay}s`,
-              } as React.CSSProperties
-            }
-            aria-label="Swimming turtle"
+      {/* Rules */}
+      <main
+        style={{
+          margin: "0 auto",
+          maxWidth: "56rem",
+          padding: `0 ${layout.mainPadX} 6rem`,
+          width: "100%",
+        }}
+      >
+        <section style={{ marginTop: xs ? "1.75rem" : "2.5rem" }}>
+          <h2
+            style={{
+              fontSize: md ? "1.5rem" : "1.875rem",
+              fontWeight: 700,
+              margin: 0,
+              lineHeight: 1.2,
+            }}
           >
-            <svg
-              width="140"
-              height="120"
-              viewBox="0 0 140 120"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* Body */}
-              <ellipse cx="70" cy="60" rx="34" ry="26" fill="#1f9a94" />
-              <ellipse cx="70" cy="60" rx="28" ry="20" fill="#25b3ac" />
-              {/* Head */}
-              <circle cx="106" cy="58" r="10" fill="#25b3ac" />
-              <circle cx="109" cy="56" r="2.5" fill="#0b3b3a" />
-              {/* Flippers */}
-              <path
-                d="M40 50 C20 40, 12 30, 28 24 C46 20, 58 38, 58 38"
-                fill="#1f9a94"
-              />
-              <path
-                d="M42 71 C24 82, 14 94, 30 98 C48 100, 60 84, 60 84"
-                fill="#1f9a94"
-              />
-              <path
-                d="M92 40 C108 28, 126 26, 124 40 C120 52, 98 50, 98 50"
-                fill="#1f9a94"
-              />
-              <path
-                d="M94 80 C112 90, 128 94, 124 104 C118 114, 98 100, 98 96"
-                fill="#1f9a94"
-              />
-              {/* Shell pattern */}
-              <g opacity="0.5">
-                <path d="M70 40 L86 60 L70 80 L54 60 Z" fill="#0f6f6a" />
-                <path d="M70 40 L70 80" stroke="#0f6f6a" strokeWidth="2" />
-                <path d="M54 60 L86 60" stroke="#0f6f6a" strokeWidth="2" />
-              </g>
-            </svg>
+            Правила игры «Джакаро»
+          </h2>
+          <p
+            style={{
+              marginTop: "0.5rem",
+              fontSize: layout.smallText,
+              color: "#a3a3a3",
+            }}
+          >
+            Краткая версия правил на русском языке (для 4 игроков, командная
+            игра 2×2).
+          </p>
+
+          <div style={{ marginTop: xs ? "1rem" : "1.5rem" }}>
+            <RuleDetails title="Цель и состав" initiallyOpen>
+              <p style={{ marginTop: 0 }}>
+                Играют 4 человека, партнёры сидят напротив. Колода — 52 карты
+                без джокеров. У каждого по 4 фишки (камешка) одного цвета. На
+                поле есть зоны: Дом, База, Общий трек и Личная безопасная зона.
+                Команда побеждает, когда все 8 её фишек оказываются в безопасной
+                зоне.
+              </p>
+            </RuleDetails>
+
+            <RuleDetails title="Подготовка и ход игры">
+              <ul style={{ paddingLeft: "1.25rem", margin: 0 }}>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  Случайным образом выбрать сдающего. Раздать каждому по 4
+                  карты.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  Ход по часовой стрелке, начинает игрок слева от сдающего.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  Игрок за ход разыгрывает одну карту и выполняет её действие.
+                </li>
+                <li>
+                  Когда все карты разыграны, сброс перемешивается и формирует
+                  новую колоду. Роль сдающего переходит по кругу.
+                </li>
+              </ul>
+            </RuleDetails>
+
+            <RuleDetails title="Значения карт">
+              <ul style={{ paddingLeft: "1.25rem", margin: 0 }}>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  <strong>Туз</strong>: вывести фишку из Дома на Базу ИЛИ пройти
+                  1 или 11 шагов по треку.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  <strong>Король</strong>: вывести фишку из Дома на Базу.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  <strong>Валет</strong>: поменять местами две фишки на треке
+                  (не в Доме/Базе/Безопасной зоне).
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  <strong>Семёрка</strong>: разбить на несколько ходов и
+                  распределить между двумя фишками.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  <strong>Четвёрка</strong>: ход назад на 4 клетки.
+                </li>
+                <li>
+                  <strong>Остальные</strong>: пройти вперёд на число, указанное
+                  на карте.
+                </li>
+              </ul>
+            </RuleDetails>
+
+            <RuleDetails title="Специальные правила">
+              <ul style={{ paddingLeft: "1.25rem", margin: 0 }}>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  Если вы приземлились на фишку соперника — его фишка
+                  возвращается Домой.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  Фишку, стоящую на своей Базе, нельзя перепрыгнуть, убить или
+                  обменять.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  Пропускать ход нельзя.
+                </li>
+                <li style={{ marginBottom: "0.25rem" }}>
+                  Две подряд идущие фишки одной команды: передняя считается
+                  «базой» и её нельзя перепрыгнуть, убить или обменять.
+                </li>
+                <li>
+                  Для входа в Безопасную зону нужно точно «досчитать» по
+                  значению карты, чтобы не пройти мимо и не уйти на новый круг.
+                </li>
+              </ul>
+            </RuleDetails>
+
+            <RuleDetails title="Конец партии">
+              <div>
+                Команда выигрывает, когда все 8 её фишек (по 4 от каждого
+                игрока) стоят в их Безопасных зонах.
+              </div>
+            </RuleDetails>
           </div>
-        ))}
-      </div>
 
-      {/* Bubbles */}
-      <div className="bubble-layer" aria-hidden>
-        {bubbles.map((b, i) => (
-          <span
-            key={i}
-            className="bubble"
-            style={
-              {
-                "--left": b.left,
-                "--size": `${b.size}px`,
-                "--delay": `${b.delay}s`,
-                "--duration": `${b.duration}s`,
-              } as React.CSSProperties
-            }
-          />
-        ))}
-      </div>
+          <div
+            style={{
+              marginTop: "2rem",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: "0.75rem",
+            }}
+          >
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.print();
+              }}
+              style={{
+                borderRadius: "1rem",
+                border: "1px solid #404040",
+                backgroundColor: "#171717",
+                padding: xs ? "0.5rem 0.875rem" : "0.5rem 1rem",
+                fontSize: layout.smallText,
+                color: "#ffffff",
+                textDecoration: "none",
+                transition: "background-color 150ms ease",
+                width: xs ? "100%" : "auto",
+                textAlign: "center",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#262626")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#171717")
+              }
+            >
+              Распечатать правила
+            </a>
 
-      {/* Waves */}
-      <div className="waves">
-        <div className="wave wave-1" />
-        <div className="wave wave-2" />
-        <div className="wave wave-3" />
-      </div>
+            <a
+              href="#upload"
+              style={{
+                borderRadius: "1rem",
+                border: "1px solid rgba(245,158,11,0.4)",
+                backgroundColor: "rgba(245,158,11,0.10)",
+                padding: xs ? "0.5rem 0.875rem" : "0.5rem 1rem",
+                fontSize: layout.smallText,
+                color: "#ffffff",
+                textDecoration: "none",
+                transition: "background-color 150ms ease",
+                width: xs ? "100%" : "auto",
+                textAlign: "center",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  "rgba(245,158,11,0.20)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  "rgba(245,158,11,0.10)")
+              }
+            >
+              Заменить аватар
+            </a>
+          </div>
+        </section>
 
-      <footer className="foot">
-        © {new Date().getFullYear()} Turtly — pure CSS, React 18.
-      </footer>
+        {/* Footer */}
+        <footer
+          style={{
+            marginTop: xs ? "2.5rem" : "4rem",
+            borderTop: "1px solid #262626",
+            paddingTop: xs ? "1rem" : "1.5rem",
+            fontSize: layout.smallText,
+            color: "#737373",
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            *Правила кратко адаптированы на основе общедоступных источников.
+            Полные правила могут отличаться в отдельных вариантах.
+          </p>
+        </footer>
+      </main>
     </div>
   );
 }
