@@ -206,20 +206,8 @@ export default function JackarooLanding() {
                   wordWrap: "break-word",
                 }}
               >
-                Автор • Священник
+                Автор - Священник
               </h1>
-
-              <p
-                style={{
-                  marginTop: "0.75rem",
-                  color: "#d4d4d4",
-                  lineHeight: 1.6,
-                  fontSize: xs ? "0.95rem" : "1rem",
-                }}
-              >
-                Добро пожаловать! Здесь краткая инструкция по настольной игре
-                «Джакаро».
-              </p>
 
               <div
                 style={{
@@ -272,6 +260,18 @@ export default function JackarooLanding() {
                   {copied ? "Скопировано!" : "Скопировать"}
                 </button>
               </div>
+
+              <p
+                style={{
+                  marginTop: "0.75rem",
+                  color: "#d4d4d4",
+                  lineHeight: 1.6,
+                  fontSize: xs ? "0.95rem" : "1rem",
+                }}
+              >
+                Добро пожаловать! Здесь краткая инструкция по настольной игре
+                «Джакаро».
+              </p>
             </div>
 
             {/* Avatar column */}
