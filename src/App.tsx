@@ -13,7 +13,6 @@ function useViewport() {
   }, []);
   return {
     width: w,
-    // breakpoints
     xs: w < 480,
     sm: w < 640,
     md: w < 768,
@@ -50,6 +49,7 @@ function RuleDetails({ title, children, initiallyOpen = false }: any) {
           justifyContent: "space-between",
           gap: "0.75rem",
           flexWrap: "wrap",
+          minWidth: 0,
         }}
       >
         {title}
@@ -91,7 +91,7 @@ function RuleDetails({ title, children, initiallyOpen = false }: any) {
 export default function JackarooLanding() {
   const { xs, sm, md, lg } = useViewport();
 
-  // Responsive tokens (tweak here, everything else follows)
+  // Responsive tokens
   const layout = useMemo(() => {
     const titleSize = xs
       ? "1.75rem"
@@ -107,12 +107,9 @@ export default function JackarooLanding() {
     const gridCols = md ? "1fr" : "1fr 1fr";
     const gridGap = xs ? "1rem" : sm ? "1.25rem" : "2rem";
     const avatar = xs ? 220 : sm ? 260 : md ? 300 : lg ? 320 : 340;
-    const mainMaxW = lg ? "56rem" : "56rem"; // keep center width fixed; padding handles small screens
     const mainPadX = xs ? "0.75rem" : "1rem";
-    const heroMaxW = "72rem";
     const smallText = xs ? "0.8125rem" : "0.875rem";
-    const bodyText = xs ? "0.9375rem" : "1rem"; // for buttons and ID box
-    const detailsTitle = xs ? "1rem" : "1.125rem";
+    const bodyText = xs ? "0.9375rem" : "1rem";
     return {
       titleSize,
       containerPadY,
@@ -120,12 +117,9 @@ export default function JackarooLanding() {
       gridCols,
       gridGap,
       avatar,
-      mainMaxW,
       mainPadX,
-      heroMaxW,
       smallText,
       bodyText,
-      detailsTitle,
     };
   }, [xs, sm, md, lg]);
 
@@ -148,25 +142,39 @@ export default function JackarooLanding() {
         minHeight: "100vh",
         backgroundColor: "#0a0a0a",
         color: "#f5f5f5",
+        overflowX: "hidden", // ⟵ prevent viewport scrollbars
+        width: "100%",
+        maxWidth: "100vw", // ⟵ clamp to viewport
+        boxSizing: "border-box",
       }}
     >
       {/* Hero */}
-      <header style={{ position: "relative", overflow: "hidden" }}>
+      <header
+        style={{
+          position: "relative",
+          overflow: "hidden", // ⟵ clip the blurred background
+          width: "100%",
+          maxWidth: "100vw",
+        }}
+      >
         <div
           style={{
             position: "absolute",
-            inset: 0,
+            inset: 0, // ⟵ no negative insets
             backgroundImage:
               "linear-gradient(to bottom right, rgba(245,158,11,0.10), rgba(239,68,68,0.10), rgba(217,70,239,0.10))",
             filter: "blur(64px)",
+            pointerEvents: "none",
           }}
         />
         <div
           style={{
             position: "relative",
             margin: "0 auto",
-            maxWidth: layout.heroMaxW,
+            maxWidth: "72rem",
+            width: "100%",
             padding: `${layout.containerPadY} ${layout.containerPadX} calc(${layout.containerPadY} + 1rem)`,
+            boxSizing: "border-box",
           }}
         >
           <div
@@ -175,14 +183,17 @@ export default function JackarooLanding() {
               gridTemplateColumns: layout.gridCols,
               gap: layout.gridGap,
               alignItems: "center",
+              width: "100%",
+              maxWidth: "100%",
+              boxSizing: "border-box",
+              minWidth: 0, // ⟵ grid can shrink
             }}
           >
             {/* Text column */}
             <div
               style={{
-                order: md
-                  ? 2
-                  : 1 /* put text below avatar on tiny screens if you want */,
+                order: md ? 2 : 1,
+                minWidth: 0, // ⟵ prevents text from forcing overflow
               }}
             >
               <h1
@@ -192,6 +203,7 @@ export default function JackarooLanding() {
                   fontSize: layout.titleSize,
                   margin: 0,
                   lineHeight: 1.1,
+                  wordWrap: "break-word",
                 }}
               >
                 Священник • Phoenix
@@ -233,6 +245,7 @@ export default function JackarooLanding() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={handleCopy}
                   style={{
                     borderRadius: "1rem",
@@ -284,20 +297,28 @@ export default function JackarooLanding() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                minWidth: 0,
               }}
             >
-              <div style={{ position: "relative" }}>
+              {/* Wrapper clips the glow — no overflow */}
+              <div
+                style={{
+                  position: "relative",
+                  overflow: "hidden",
+                  borderRadius: "2rem",
+                }}
+              >
+                {/* Glow layer now uses inset: 0 (no negative offsets) */}
                 <div
                   style={{
                     position: "absolute",
-                    left: `-${Math.round(layout.avatar * 0.012)}px`,
-                    right: `-${Math.round(layout.avatar * 0.012)}px`,
-                    top: `-${Math.round(layout.avatar * 0.012)}px`,
-                    bottom: `-${Math.round(layout.avatar * 0.012)}px`,
+                    inset: 0,
                     borderRadius: "2rem",
                     backgroundImage:
                       "linear-gradient(to top right, rgba(245,158,11,0.30), rgba(239,68,68,0.30), rgba(217,70,239,0.30))",
                     filter: "blur(24px)",
+                    transform: "scale(1.06)", // slight spread without overflowing
+                    pointerEvents: "none",
                   }}
                 />
                 <div
@@ -309,6 +330,8 @@ export default function JackarooLanding() {
                     backgroundColor: "#171717",
                     boxShadow:
                       "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+                    maxWidth: "90vw",
+                    maxHeight: "90vw",
                   }}
                 >
                   <img
@@ -335,8 +358,10 @@ export default function JackarooLanding() {
         style={{
           margin: "0 auto",
           maxWidth: "56rem",
-          padding: `0 ${layout.mainPadX} 6rem`,
           width: "100%",
+          padding: `0 ${layout.mainPadX} 6rem`,
+          boxSizing: "border-box",
+          overflowX: "hidden", // ⟵ belt-and-suspenders
         }}
       >
         <section style={{ marginTop: xs ? "1.75rem" : "2.5rem" }}>
@@ -418,99 +443,12 @@ export default function JackarooLanding() {
               </ul>
             </RuleDetails>
 
-            <RuleDetails title="Специальные правила">
-              <ul style={{ paddingLeft: "1.25rem", margin: 0 }}>
-                <li style={{ marginBottom: "0.25rem" }}>
-                  Если вы приземлились на фишку соперника — его фишка
-                  возвращается Домой.
-                </li>
-                <li style={{ marginBottom: "0.25rem" }}>
-                  Фишку, стоящую на своей Базе, нельзя перепрыгнуть, убить или
-                  обменять.
-                </li>
-                <li style={{ marginBottom: "0.25rem" }}>
-                  Пропускать ход нельзя.
-                </li>
-                <li style={{ marginBottom: "0.25rem" }}>
-                  Две подряд идущие фишки одной команды: передняя считается
-                  «базой» и её нельзя перепрыгнуть, убить или обменять.
-                </li>
-                <li>
-                  Для входа в Безопасную зону нужно точно «досчитать» по
-                  значению карты, чтобы не пройти мимо и не уйти на новый круг.
-                </li>
-              </ul>
-            </RuleDetails>
-
             <RuleDetails title="Конец партии">
               <div>
                 Команда выигрывает, когда все 8 её фишек (по 4 от каждого
                 игрока) стоят в их Безопасных зонах.
               </div>
             </RuleDetails>
-          </div>
-
-          <div
-            style={{
-              marginTop: "2rem",
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              gap: "0.75rem",
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => window.print()}
-              aria-label="Распечатать правила"
-              style={{
-                borderRadius: "1rem",
-                border: "1px solid #404040",
-                backgroundColor: "#171717",
-                padding: xs ? "0.5rem 0.875rem" : "0.5rem 1rem",
-                fontSize: layout.smallText,
-                color: "#ffffff",
-                textDecoration: "none",
-                transition: "background-color 150ms ease",
-                width: xs ? "100%" : "auto",
-                textAlign: "center",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "#262626")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "#171717")
-              }
-            >
-              Распечатать правила
-            </button>
-
-            <a
-              href="#upload"
-              style={{
-                borderRadius: "1rem",
-                border: "1px solid rgba(245,158,11,0.4)",
-                backgroundColor: "rgba(245,158,11,0.10)",
-                padding: xs ? "0.5rem 0.875rem" : "0.5rem 1rem",
-                fontSize: layout.smallText,
-                color: "#ffffff",
-                textDecoration: "none",
-                transition: "background-color 150ms ease",
-                width: xs ? "100%" : "auto",
-                textAlign: "center",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor =
-                  "rgba(245,158,11,0.20)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor =
-                  "rgba(245,158,11,0.10)")
-              }
-            >
-              Заменить аватар
-            </a>
           </div>
         </section>
 
