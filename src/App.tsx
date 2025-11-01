@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import terter from "./terter.png";
+import { useEffect, useMemo, useState } from "react";
+import terter from "./terter.jpg";
 
 /** Tiny responsive hook (no CSS, no Tailwind) */
 function useViewport() {
@@ -128,7 +128,7 @@ export default function JackarooLanding() {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`WePlay ID: ${weplayId}`);
+      await navigator.clipboard.writeText(weplayId);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch (e) {
