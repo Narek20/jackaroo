@@ -89,7 +89,7 @@ function RuleDetails({ title, children, initiallyOpen = false }: any) {
 }
 
 export default function JackarooLanding() {
-  const { xs, sm, md, lg, width } = useViewport();
+  const { xs, sm, md, lg } = useViewport();
 
   // Responsive tokens (tweak here, everything else follows)
   const layout = useMemo(() => {
@@ -459,12 +459,10 @@ export default function JackarooLanding() {
               gap: "0.75rem",
             }}
           >
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                window.print();
-              }}
+            <button
+              type="button"
+              onClick={() => window.print()}
+              aria-label="Распечатать правила"
               style={{
                 borderRadius: "1rem",
                 border: "1px solid #404040",
@@ -476,6 +474,7 @@ export default function JackarooLanding() {
                 transition: "background-color 150ms ease",
                 width: xs ? "100%" : "auto",
                 textAlign: "center",
+                cursor: "pointer",
               }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.backgroundColor = "#262626")
@@ -485,7 +484,7 @@ export default function JackarooLanding() {
               }
             >
               Распечатать правила
-            </a>
+            </button>
 
             <a
               href="#upload"
